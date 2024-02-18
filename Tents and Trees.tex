@@ -1,0 +1,130 @@
+\documentclass{classe-tex3R}
+\usepackage{style-tex3R}
+% \usepackage{flashcards}
+
+\begin{document}
+
+\newlength{\dimensionscellule}
+  \setlength{\dimensionscellule}{1cm}
+\newlength{\epaisseurtrait}
+  \setlength{\epaisseurtrait}{1pt}
+\newcommand{\colorborder}{LightSlateGrey}
+\newcommand{\cellule}[2]{%
+  \adjustbox{valign=t}{\begin{minipage}{\dimensionscellule}%
+  \begin{tcolorbox}[#1]
+    #2
+  \end{tcolorbox}%
+  \end{minipage}}\hspace{-1\epaisseurtrait}%
+  }
+
+\tcbset{
+  pleine/.style={
+    boxrule=\epaisseurtrait,
+    before=0pt,
+    before skip=0pt,
+    after=0pt,
+    after skip=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    grow to left by=0pt,
+    grow to right by=0pt,
+    colback=white,
+    colframe=\colorborder,
+    top=0cm,
+    bottom=0cm,
+    left=0cm,
+    right=0cm,
+    boxsep=0pt,
+    valign=center,
+    halign=center,
+    sharp corners,
+    width=\dimensionscellule, 
+    height=\dimensionscellule
+  },
+  vide/.style={
+    boxrule=0pt,
+    before=0pt,
+    before skip=0pt,
+    after=0pt,
+    after skip=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    grow to left by=0pt,
+    grow to right by=0pt,
+    colback=white,
+    colframe=white,
+    top=0cm,
+    bottom=0cm,
+    left=0cm,
+    right=0cm,
+    boxsep=0pt,
+    valign=center,
+    halign=center,
+    sharp corners,
+    width=\dimensionscellule, 
+    height=\dimensionscellule
+  }
+}
+
+\begin{luacode*}
+
+local function latexGrille(seed,n,bool)
+  math.randomseed(seed)
+  local fonctions = require("./TnT.lua")
+  local grille = fonctions.genereGrille(n)
+  local stringGrille =''
+  local etat
+  local cellule
+  local caractere
+
+  for i=1,n+1 do
+    for j=1,n+1 do
+      if i == 1 or j == 1 then
+        etat = 'vide'
+      else
+        etat = 'pleine'
+      end
+
+      cellule = grille[i][j]
+
+      if cellule == 'V' then
+        caractere = ''
+      elseif cellule == 'T' then
+        if bool == true then
+          caractere = '\\includegraphics[width=0.9\\dimensionscellule]{Tent.png}'
+        else
+          caractere = ''
+        end
+      elseif cellule == 'A' then
+        caractere = '\\includegraphics[width=0.9\\dimensionscellule]{Tree.png}'
+      else
+        caractere = cellule
+      end
+
+      stringGrille = stringGrille .. '\\cellule{' .. etat .. '}{' .. caractere .. '}'
+    end
+      stringGrille = stringGrille .. '\\par\\vspace{-2\\epaisseurtrait}'
+  end
+  tex.sprint(stringGrille)
+end
+
+
+
+
+local seed = 1
+local n = 18
+
+latexGrille(seed,n,false)
+
+tex.sprint('\\newpage')
+
+latexGrille(seed,n,true)
+
+
+\end{luacode*}
+
+
+
+
+
+\end{document}

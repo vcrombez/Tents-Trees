@@ -1,0 +1,192 @@
+\NeedsTeXFormat{LaTeX2e}[2022-11-01]
+\ProvidesPackage{flashcards-tex3R}
+
+\newlength{\dimensionscadre}
+\newlength{\dimensionsinterieur}
+\newlength{\dimensionsdifficulte}
+  \setlength{\dimensionscadre}{9.8cm} %29.7/3 semble un peu juste pour le copieur
+  \setlength{\dimensionsinterieur}{7.8cm} %1cm de marge sur chaque côté pour l'intérieur
+  \setlength{\dimensionsdifficulte}{3.9cm} %moitié de la dimension intérieure
+\newcommand{\icone}{\faCog}
+\definecolor{couleurflashcard}{rgb}{0,0,0}
+\newcounter{compteurflashcard}
+  \setcounter{compteurflashcard}{0}
+
+\RenewEnviron{enonce}{
+  \directlua{
+    local enonce = "\luaescapestring{\BODY}"
+    table.insert(ENONCE,enonce) 
+  }
+}
+  
+\RenewEnviron{correction}{
+  \correctiontrue
+  \enoncefalse
+  \directlua{
+    local correction = "\luaescapestring{\BODY}"
+    table.insert(CORRECTION,correction) 
+  }
+}
+  
+\renewcommand{\difficulte}[1]{
+  \directlua{
+    table.insert(DIFFICULTE,"#1") 
+  }
+}
+
+\tcbset{
+  cadre/.style={
+    before=0pt,
+    before skip=0pt,
+    after=0pt,
+    after skip=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    grow to left by=0pt,
+    grow to right by=0pt,
+    colback=white,
+    top=1cm,
+    bottom=1cm,
+    left=1cm,
+    right=1cm,
+    boxsep=0pt,
+    sharp corners,
+    width=\dimensionscadre, 
+    height=\dimensionscadre
+  },
+  interieur/.style={
+    before=0pt,
+    before skip=0pt,
+    after=0pt,
+    after skip=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    grow to left by=0pt,
+    grow to right by=0pt,
+    valign=center,
+    halign=center,
+    width=\dimensionsinterieur, 
+    height=\dimensionsinterieur,
+    arc=3mm
+  },
+  difficulte/.style={
+    before=0pt,
+    before skip=0pt,
+    after=0pt,
+    after skip=0pt,
+    left skip=0pt,
+    right skip=0pt,
+    grow to left by=0pt,
+    grow to right by=0pt,
+    colback=couleurflashcard,
+    valign=center,
+    halign=center,
+    top=0.1cm,
+    bottom=0.1cm,
+    left=0cm,
+    right=0cm,
+    boxsep=0pt,
+    leftrule=0pt,
+    bottomrule=0pt,
+    rightrule=0pt,
+    toprule=0pt,
+    arc=3mm,
+    width=\dimensionsdifficulte
+  }
+}
+
+\begin{luacode*}
+  ENONCE = {}
+  CORRECTION = {}
+  DIFFICULTE = {}
+
+  function FormatageString(string)
+    if string ~= nil then
+      newString = string.gsub(string, "\n", "")
+      newString = string.gsub(newString, "^%s+", "")
+      newString = string.gsub(newString, "%s+$", "")
+    end
+    return newString
+  end
+
+  function carteFlashcard(i,env)
+
+    local couleur
+    local motcle
+    local difficulte = DIFFICULTE[i]
+
+    if difficulte == '' then
+      couleur = 'LightGray'
+      motcle = 'AUTRE'
+    elseif difficulte == '0' then
+      couleur = 'Aqua'
+      motcle = 'CONSIGNE'
+    elseif difficulte == '1' then
+      couleur = 'Green'
+      motcle = 'INITIATION'
+    elseif difficulte == '2' then
+      couleur = 'Gold'
+      motcle = 'DÉBUTANT'
+    elseif difficulte == '3' then
+      couleur = 'Red'
+      motcle = 'CONFIRMÉ'
+    else
+      couleur = 'Indigo'
+      motcle = 'EXPERT'
+    end
+
+    if env == 'correction' and difficulte ~= '0' then
+      motcle = 'SOLUTION'
+    end
+
+    local code = '' ..
+    '\\adjustbox{valign=t}{\\begin{minipage}{\\dimensionscadre}' ..
+      '\\begin{tcolorbox}[cadre]' ..
+        '\\begin{tcolorbox}[interieur]' ..
+          ENONCE[i] ..
+        '\\end{tcolorbox}\\par\\colorlet{couleurflashcard}{' .. couleur ..'}' ..
+        '\\vspace{-0.35cm}\\hspace{0.9\\dimensionsdifficulte}\\begin{minipage}{\\dimensionsdifficulte}' ..
+        '\\begin{tcolorbox}[difficulte]' ..
+          '\\textcolor{white}{\\textbf{\\icone~' .. motcle .. ' ' .. i ..  '}}' ..
+        '\\end{tcolorbox}' ..
+        '\\end{minipage}' ..
+      '\\end{tcolorbox}' ..
+    '\\end{minipage}}'
+
+    return code
+  end
+
+  function genereFlashcard()
+
+    local env
+
+    while #ENONCE % 6 ~= 0 do
+      table.insert(ENONCE,'')
+      table.insert(CORRECTION,'')
+      table.insert(DIFFICULTE,'')
+    end
+
+    for i=1,#ENONCE,6 do
+
+      env = 'enonce'
+
+      tex.sprint('\\begin{minipage}{2\\dimensionscadre}' .. carteFlashcard(i,env) .. carteFlashcard(i+1,env) .. '\\par\\vspace{-1pt}' .. carteFlashcard(i+2,env) .. carteFlashcard(i+3,env) .. '\\par\\vspace{-1pt}' .. carteFlashcard(i+4,env) .. carteFlashcard(i+5,env) .. '\\end{minipage}\\newpage')
+
+      env = 'correction'
+
+      tex.sprint('\\hfill\\begin{minipage}{2\\dimensionscadre}' .. carteFlashcard(i+1,env) .. carteFlashcard(i,env) .. '\\par\\vspace{-1pt}' .. carteFlashcard(i+3,env) .. carteFlashcard(i+2,env) .. '\\par\\vspace{-1pt}' .. carteFlashcard(i+5,env) .. carteFlashcard(i+4,env) .. '\\end{minipage}\\newpage')
+
+    end
+
+  end
+\end{luacode*}
+
+\AtEndDocument{\directlua{genereFlashcard()}}
+\AtBeginDocument{
+  \newgeometry{
+    top=0cm,
+    bottom=0cm,
+    left=0cm,
+    right=0cm,
+  }
+}
