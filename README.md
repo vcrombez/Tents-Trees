@@ -13,6 +13,14 @@ Le code permet d'adapter la taille de la grille (initiation 4x4, débutant 6x6, 
 
 Une version compilée est disponible dans le dossier `livret` : [https://raw.githubusercontent.com/vcrombez/Tents-Trees/main/livret/Livret-TnT.pdf](https://raw.githubusercontent.com/vcrombez/Tents-Trees/main/livret/Livret-TnT.pdf)
 
+## Règles du jeu
+
+- Chaque arbre possède sa tente.
+- La tente doit être placée orthogonalement adjacente à l'arbre.
+- Les tentes ne se touchent jamais orthogonalement ou en diagonale.
+- Les nombres indiquent combien de tentes sont présentes dans la ligne ou la colonne.
+- Chaque tuile à compléter est soit vide, soit une tente.
+
 ## Compilation
 
 Les fichiers `classe-tex3R.cls`, `style-tex3R.sty`, `tnt-tex3R.sty` et `flashcards-tex3R.sty` sont des fichiers de configuration personnels adaptés du projet tex3R pour l'occasion : [https://github.com/Tex3rivieres/TeX3R-ClasseStyle/releases](https://github.com/Tex3rivieres/TeX3R-ClasseStyle/releases)
