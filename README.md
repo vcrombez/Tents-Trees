@@ -11,7 +11,7 @@ Ce projet a pour ambition de permettre aux amateurs de casse-tête de générer 
 
 Le code permet d'adapter la taille de la grille (initiation 4x4, débutant 6x6, confirmé 8x8 et expert 10x10).
 
-Une version compilée est disponible dans le dossier `livret` : 
+Une version compilée est disponible dans le dossier `livret` : [https://raw.githubusercontent.com/vcrombez/Tents-Trees/main/livret/Livret-TnT.pdf](https://raw.githubusercontent.com/vcrombez/Tents-Trees/main/livret/Livret-TnT.pdf)
 
 ## Compilation
 
