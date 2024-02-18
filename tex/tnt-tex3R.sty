@@ -1,14 +1,15 @@
-\documentclass{classe-tex3R}
-\usepackage{style-tex3R}
-% \usepackage{flashcards}
-
-\begin{document}
+\NeedsTeXFormat{LaTeX2e}[2022-11-01]
+\ProvidesPackage{tnt-tex3R}
 
 \newlength{\dimensionscellule}
-  \setlength{\dimensionscellule}{1cm}
 \newlength{\epaisseurtrait}
-  \setlength{\epaisseurtrait}{1pt}
 \newcommand{\colorborder}{LightSlateGrey}
+\newcommand{\echelle}{1}
+
+\setlength{\epaisseurtrait}{1pt}
+\setlength{\dimensionscellule}{1cm}
+% \renewcommand{\colorborder}{LightSlateGrey}
+
 \newcommand{\cellule}[2]{%
   \adjustbox{valign=t}{\begin{minipage}{\dimensionscellule}%
   \begin{tcolorbox}[#1]
@@ -68,9 +69,9 @@
 
 \begin{luacode*}
 
-local function latexGrille(seed,n,bool)
+function latexGrille(seed,n,bool)
   math.randomseed(seed)
-  local fonctions = require("./TnT.lua")
+  local fonctions = require("../scripts/TnT.lua")
   local grille = fonctions.genereGrille(n)
   local stringGrille =''
   local etat
@@ -98,33 +99,13 @@ local function latexGrille(seed,n,bool)
       elseif cellule == 'A' then
         caractere = '\\includegraphics[width=0.9\\dimensionscellule]{Tree.png}'
       else
-        caractere = cellule
+        caractere = '\\scalebox{\\echelle}{' .. cellule .. '}'
       end
 
       stringGrille = stringGrille .. '\\cellule{' .. etat .. '}{' .. caractere .. '}'
     end
       stringGrille = stringGrille .. '\\par\\vspace{-2\\epaisseurtrait}'
   end
-  tex.sprint(stringGrille)
+  return stringGrille
 end
-
-
-
-
-local seed = 1
-local n = 18
-
-latexGrille(seed,n,false)
-
-tex.sprint('\\newpage')
-
-latexGrille(seed,n,true)
-
-
 \end{luacode*}
-
-
-
-
-
-\end{document}

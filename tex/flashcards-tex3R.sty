@@ -11,6 +11,7 @@
 \definecolor{couleurflashcard}{rgb}{0,0,0}
 \newcounter{compteurflashcard}
   \setcounter{compteurflashcard}{0}
+\newif\ifcheck
 
 \RenewEnviron{enonce}{
   \directlua{
@@ -96,9 +97,9 @@
 }
 
 \begin{luacode*}
-  ENONCE = {}
-  CORRECTION = {}
-  DIFFICULTE = {}
+  ENONCE = {'\\includegraphics[width=0.9\\dimensionsinterieur]{Tents-and-trees.png}'}
+  CORRECTION = {"\\begin{itemize}[leftmargin=0.6cm,label=$\\setlength{\\itemsep}{0.7cm}\\empty$]\\par\\item Chaque arbre possède sa tente.\\par\\item La tente doit être placé orthogonalement adjacente à l'arbre.\\par\\item Les tentes ne se touchent jamais orthogonalement ou en diagonale.\\par Les nombres indiquent combien de tentes sont présentes dans la ligne ou la colonne.\\par\\item Chaque tuile à compléter est soit vide, soit une tente.\\end{itemize}\\par"}
+  DIFFICULTE = {'0'}
 
   function FormatageString(string)
     if string ~= nil then
@@ -114,6 +115,9 @@
     local couleur
     local motcle
     local difficulte = DIFFICULTE[i]
+    local contenu
+    local checkFirst
+    local checkEnd
 
     if difficulte == '' then
       couleur = 'LightGray'
@@ -139,16 +143,31 @@
       motcle = 'SOLUTION'
     end
 
+    if env == 'enonce' and difficulte == '0' then
+      checkFirst = '\\ifcheck'
+      checkEnd = '\\fi'
+    else
+      checkFirst = ''
+      checkEnd = ''
+    end
+
+    if env == 'correction' then
+      contenu = CORRECTION[i]
+    else
+      contenu = ENONCE[i]
+    end
+
     local code = '' ..
+    '\\scaling{' .. SCALING ..'}\\checkfalse' ..
     '\\adjustbox{valign=t}{\\begin{minipage}{\\dimensionscadre}' ..
       '\\begin{tcolorbox}[cadre]' ..
         '\\begin{tcolorbox}[interieur]' ..
-          ENONCE[i] ..
+          contenu ..
         '\\end{tcolorbox}\\par\\colorlet{couleurflashcard}{' .. couleur ..'}' ..
         '\\vspace{-0.35cm}\\hspace{0.9\\dimensionsdifficulte}\\begin{minipage}{\\dimensionsdifficulte}' ..
-        '\\begin{tcolorbox}[difficulte]' ..
+        checkFirst .. '\\begin{tcolorbox}[difficulte]' ..
           '\\textcolor{white}{\\textbf{\\icone~' .. motcle .. ' ' .. i ..  '}}' ..
-        '\\end{tcolorbox}' ..
+        '\\end{tcolorbox}' .. checkEnd ..
         '\\end{minipage}' ..
       '\\end{tcolorbox}' ..
     '\\end{minipage}}'

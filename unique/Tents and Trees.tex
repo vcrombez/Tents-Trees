@@ -1,0 +1,17 @@
+\documentclass{../tex/classe-tex3R}
+\usepackage{../tex/style-tex3R}
+\usepackage{../tex/tnt-tex3R}
+\graphicspath{{../images/}}
+
+\begin{document}
+
+\begin{luacode*}
+  local seed = 1
+  local n = 18
+
+  tex.sprint(latexGrille(seed,n,false))
+  tex.sprint('\\newpage')
+  tex.sprint(latexGrille(seed,n,true))
+\end{luacode*}
+
+\end{document}
